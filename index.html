@@ -96,6 +96,14 @@
     .panel-body{padding:18px 20px 24px;flex:1;}
     .panel-section-label{font-family:'Space Mono',monospace;font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:10px;margin-top:18px;}
     .panel-section-label:first-child{margin-top:0;}
+    
+    /* BASEMAP SELECTOR */
+    .basemap-group{display:flex;flex-direction:column;gap:8px;}
+    .basemap-item{display:flex;align-items:center;gap:10px;cursor:pointer;padding:9px 12px;border-radius:10px;background:white;border:1px solid #e5e7eb;transition:all 0.2s;}
+    .basemap-item:hover{border-color:var(--water-bright);background:rgba(24,166,190,0.03);}
+    .basemap-item input[type="radio"]{accent-color:var(--water-mid);width:15px;height:15px;}
+    .basemap-name{font-size:12.5px;font-weight:600;color:#374151;}
+
     .layer-group{display:flex;flex-direction:column;gap:8px;}
     .layer-item{display:flex;align-items:center;gap:10px;cursor:pointer;padding:9px 12px;border-radius:10px;background:white;border:1px solid #e5e7eb;transition:all 0.2s;}
     .layer-item:hover{border-color:var(--water-bright);background:rgba(24,166,190,0.03);}
@@ -123,11 +131,18 @@
     .wisata-marker{width:36px;height:36px;background:linear-gradient(135deg,#18a6be,#0e6b7c);border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.3);}
     .wisata-marker-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;transform:rotate(45deg);color:white;font-size:14px;}
 
-    /* POPUP WISATA */
-    .popup-wisata{font-family:'Nunito',sans-serif;min-width:220px;}
+    /* POPUP WISATA & LAYER GABUNGAN */
+    .popup-wisata{font-family:'Nunito',sans-serif;min-width:240px;padding:2px;}
     .popup-foto{width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:10px;display:block;}
     .popup-nama{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#0e6b7c;margin-bottom:6px;}
     .popup-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(24,166,190,0.1);color:#0e6b7c;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+    
+    .popup-combined { font-family:'Nunito',sans-serif; min-width:240px; padding:4px; }
+    .popup-combined h4 { margin:0 0 10px; font-family:'Playfair Display',serif; color:#0e6b7c; border-bottom:2px solid #f1f5f9; padding-bottom:6px; font-size:15px; }
+    .popup-sec { margin-bottom:10px; }
+    .popup-sec:last-child { margin-bottom:0; }
+    .popup-sec-title { font-family:'Space Mono',monospace; font-size:9px; color:#94a3b8; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:2px; font-weight:700;}
+    .popup-sec-val { font-size:13px; color:#374151; font-weight:600; }
 
     /* FOOTER */
     footer{background:var(--water-deep);padding:40px 6%;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;}
@@ -209,7 +224,7 @@
     <div class="about-card">
       <div class="about-icon blue"><i class="fas fa-water"></i></div>
       <h3>Wisata Air</h3>
-      <p>Ponggok dikenal as desa wisata berbasis mata air alami yang jernih — destinasi ikonik di Klaten dengan ekosistem bawah air yang kaya.</p>
+      <p>Ponggok dikenal sebagai desa wisata berbasis mata air alami yang jernih — destinasi ikonik di Klaten dengan ekosistem bawah air yang kaya.</p>
     </div>
     <div class="about-card">
       <div class="about-icon green"><i class="fas fa-map-marked-alt"></i></div>
@@ -226,12 +241,25 @@
   <section id="peta" class="map-section">
     <div class="section-eyebrow">Geoportal Utama</div>
     <h2 class="section-title">Peta <span>Spasial</span> Interaktif</h2>
-    <p class="section-desc">Klik pada titik wisata untuk melihat foto dan informasi. Aktifkan atau nonaktifkan layer sesuai kebutuhan.</p>
+    <p class="section-desc">Klik pada titik wisata atau bidang lahan untuk melihat informasi terpadu. Aktifkan basemap citra satelit di bawah ini.</p>
 
     <div class="map-wrapper">
       <div class="layer-panel">
         <div class="panel-header"><i class="fas fa-layer-group"></i> Layer &amp; Legenda</div>
         <div class="panel-body">
+          
+          <div class="panel-section-label">Pilih Basemap</div>
+          <div class="basemap-group">
+            <label class="basemap-item">
+              <input type="radio" name="basemapToggle" id="osmBase" checked />
+              <span class="basemap-name">OpenStreetMap (Default)</span>
+            </label>
+            <label class="basemap-item">
+              <input type="radio" name="basemapToggle" id="satellitBase" />
+              <span class="basemap-name">Citra Satelit (Esri Imagery)</span>
+            </label>
+          </div>
+
           <div class="panel-section-label">Toggle Layer</div>
           <div class="layer-group">
             <label class="layer-item"><input type="checkbox" id="admLayerToggle" checked /><span class="layer-name">Batas Administrasi</span></label>
@@ -323,6 +351,8 @@
   </footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Menambahkan library turf.js untuk kalkulasi titik klik di dalam polygon (point in polygon) -->
+  <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
   <script>
     const BASE       = 'https://raw.githubusercontent.com/Aovmn/Ponggok-Webgis/main/';
     const URL_ADM    = BASE + 'Administrasi.geojson';
@@ -349,10 +379,17 @@
       headerEl.querySelector('.legend-toggle-icon').classList.toggle('collapsed');
     }
 
-    const map = L.map('map').setView([-7.6160, 110.6350], 15);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // Pendefinisian Dua Basemap Berbeda
+    const osmTile = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19, attribution: '© OpenStreetMap'
-    }).addTo(map);
+    });
+    const satelliteTile = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+      maxZoom: 19, attribution: 'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
+    });
+
+    const map = L.map('map', {
+      layers: [osmTile] // Default awal pake OSM
+    }).setView([-7.6160, 110.6350], 15);
 
     const wisataIcon = L.divIcon({
       className: '',
@@ -360,46 +397,41 @@
       iconSize: [36, 36], iconAnchor: [18, 36], popupAnchor: [0, -36]
     });
 
+    // Variabel Global untuk menyimpan mentahan data GeoJSON asli
+    let rawAdmData = null, rawTanahData = null, rawPlData = null;
     let admLayer, tanahLayer, plLayer, wisataLayer;
 
+    // Load Batas Administrasi
     fetch(URL_ADM).then(r => r.json()).then(data => {
+      rawAdmData = data;
       admLayer = L.geoJSON(data, {
         style: { color: '#060203', weight: 2, fillOpacity: 0 }
       }).addTo(map);
     }).catch(() => console.log('Gagal load Administrasi.geojson'));
 
+    // Load Status Hak Tanah
     fetch(URL_TANAH).then(r => r.json()).then(data => {
+      rawTanahData = data;
       tanahLayer = L.geoJSON(data, {
         style: f => {
           const hak = f.properties.Status_Hak || f.properties.status_hak || '';
           return { fillColor: warnaTanah[hak] || '#35dd54', fillOpacity: 0.6, color: '#333', weight: 0.5 };
-        },
-        onEachFeature: (f, layer) => {
-          const hak = f.properties.Status_Hak || f.properties.status_hak || 'Kosong';
-          layer.bindPopup(`<div style="font-family:'Nunito',sans-serif;min-width:180px;padding:4px;">
-            <h4 style="margin:0 0 8px;font-family:'Playfair Display',serif;color:#0e6b7c;border-bottom:2px solid #f1f5f9;padding-bottom:5px;font-size:14px;">Informasi Bidang Tanah</h4>
-            <p style="margin:5px 0;font-size:12px;color:#475569;"><b style="color:#1c2b20;">Status Hak:</b> ${hak}</p>
-          </div>`);
         }
       }).addTo(map);
     }).catch(() => console.log('Gagal load Status Hak.geojson'));
 
+    // Load Penggunaan Lahan
     fetch(URL_PL).then(r => r.json()).then(data => {
+      rawPlData = data;
       plLayer = L.geoJSON(data, {
         style: f => {
           const pl = f.properties.V4_JB || '';
           return { fillColor: warnaPL[pl] || '#cccccc', fillOpacity: 0.65, color: '#333', weight: 0.5 };
-        },
-        onEachFeature: (f, layer) => {
-          const pl = f.properties.V4_JB || 'Tidak Teridentifikasi';
-          layer.bindPopup(`<div style="font-family:'Nunito',sans-serif;min-width:180px;padding:4px;">
-            <h4 style="margin:0 0 8px;font-family:'Playfair Display',serif;color:#0e6b7c;border-bottom:2px solid #f1f5f9;padding-bottom:5px;font-size:14px;">Penggunaan Lahan</h4>
-            <p style="margin:5px 0;font-size:12px;color:#475569;"><b style="color:#1c2b20;">Jenis:</b> ${pl}</p>
-          </div>`);
         }
       }).addTo(map);
     }).catch(() => console.log('Gagal load Penggunaan Lahan.geojson'));
 
+    // Load Wisata (Titik khusus penanda wisata menggunakan marker bawaan tersendiri agar pop-up foto berfungsi prima)
     fetch(URL_WISATA).then(r => r.json()).then(data => {
       wisataLayer = L.geoJSON(data, {
         pointToLayer: (f, latlng) => L.marker(latlng, { icon: wisataIcon }),
@@ -415,6 +447,97 @@
       }).addTo(map);
     }).catch(() => console.log('Gagal load Wisata.geojson'));
 
+    // LOGIKA INTEGRASI: Fungsi Menyatukan Semua Informasi Klik Lahan Polygon
+    map.on('click', function(e) {
+      const pt = turf.point([e.latlng.lng, e.latlng.lat]);
+      let infoAdm = null;
+      let infoHak = null;
+      let infoPl = null;
+
+      // 1. Ambil info Administrasi (jika layernya sedang aktif di peta)
+      if (rawAdmData && map.hasLayer(admLayer)) {
+        for (let feat of rawAdmData.features) {
+          if (feat.geometry && (feat.geometry.type === 'Polygon' || feat.geometry.type === 'MultiPolygon')) {
+            if (turf.booleanPointInPolygon(pt, feat)) {
+              infoAdm = feat.properties.NAMOBJ || feat.properties.namobj || feat.properties.Desa || 'Terdeteksi';
+              break;
+            }
+          }
+        }
+      }
+
+      // 2. Ambil info Status Hak (jika layernya sedang aktif di peta)
+      if (rawTanahData && map.hasLayer(tanahLayer)) {
+        for (let feat of rawTanahData.features) {
+          if (feat.geometry && (feat.geometry.type === 'Polygon' || feat.geometry.type === 'MultiPolygon')) {
+            if (turf.booleanPointInPolygon(pt, feat)) {
+              infoHak = feat.properties.Status_Hak || feat.properties.status_hak || 'Kosong';
+              break;
+            }
+          }
+        }
+      }
+
+      // 3. Ambil info Penggunaan Lahan (jika layernya sedang aktif di peta)
+      if (rawPlData && map.hasLayer(plLayer)) {
+        for (let feat of rawPlData.features) {
+          if (feat.geometry && (feat.geometry.type === 'Polygon' || feat.geometry.type === 'MultiPolygon')) {
+            if (turf.booleanPointInPolygon(pt, feat)) {
+              infoPl = feat.properties.V4_JB || 'Tidak Teridentifikasi';
+              break;
+            }
+          }
+        }
+      }
+
+      // Bangun konten popup terpadu jika ada minimal satu info layer yang ter-klik
+      if (infoAdm || infoHak || infoPl) {
+        let content = `<div class="popup-combined">
+          <h4><i class="fas fa-info-circle"></i> Informasi Geospasial</h4>`;
+        
+        if (infoAdm) {
+          content += `<div class="popup-sec">
+            <div class="popup-sec-title">Wilayah Administrasi</div>
+            <div class="popup-sec-val">${infoAdm}</div>
+          </div>`;
+        }
+        if (infoHak) {
+          content += `<div class="popup-sec">
+            <div class="popup-sec-title">Status Hak Tanah</div>
+            <div class="popup-sec-val">${infoHak}</div>
+          </div>`;
+        }
+        if (infoPl) {
+          content += `<div class="popup-sec">
+            <div class="popup-sec-title">Penggunaan Lahan</div>
+            <div class="popup-sec-val">${infoPl}</div>
+          </div>`;
+        }
+        
+        content += `</div>`;
+
+        L.popup()
+          .setLatLng(e.latlng)
+          .setContent(content)
+          .openOn(map);
+      }
+    });
+
+    // Kontrol Navigasi Ganti Basemap (Radio Button)
+    document.getElementById('osmBase').addEventListener('change', function(e) {
+      if (e.target.checked) {
+        map.removeLayer(satelliteTile);
+        map.addLayer(osmTile);
+      }
+    });
+    document.getElementById('satellitBase').addEventListener('change', function(e) {
+      if (e.target.checked) {
+        map.removeLayer(osmTile);
+        map.addLayer(satelliteTile);
+      }
+    });
+
+    // Kontrol Navigasi Layer Hidup/Mati (Checkbox)
     document.getElementById('admLayerToggle').addEventListener('change', e => {
       if (!admLayer) return;
       e.target.checked ? map.addLayer(admLayer) : map.removeLayer(admLayer);
