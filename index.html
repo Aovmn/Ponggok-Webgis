@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Desa Wisata Ponggok — Portal Geospasial & Tata Ruang</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Nunito:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <style>
+    :root {
+      --water-deep:#0a3d47; --water-mid:#0e6b7c; --water-bright:#18a6be;
+      --water-light:#7dd8e8; --sand:#f5ede0; --leaf-dark:#1a4d2e;
+      --leaf-mid:#2d7a4f; --leaf-light:#6dbe8c; --cream:#fdf8f1;
+      --text-dark:#1c2b20; --text-mid:#3d5a45;
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    html{scroll-behavior:smooth;}
+    body{font-family:'Nunito',sans-serif;background:var(--cream);color:var(--text-dark);overflow-x:hidden;}
+
+    /* NAVBAR */
+    .navbar{position:fixed;top:0;left:0;right:0;z-index:9999;display:flex;justify-content:space-between;align-items:center;padding:0 6%;height:70px;background:rgba(10,61,71,0.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(125,216,232,0.15);}
+    .nav-brand{display:flex;align-items:center;gap:12px;text-decoration:none;}
+    .brand-emblem{width:40px;height:40px;background:linear-gradient(135deg,var(--water-bright),var(--leaf-mid));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;color:white;box-shadow:0 0 0 3px rgba(125,216,232,0.25);}
+    .brand-text{display:flex;flex-direction:column;line-height:1.1;}
+    .brand-main{font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--water-light);}
+    .brand-sub{font-family:'Space Mono',monospace;font-size:9px;color:rgba(255,255,255,0.5);letter-spacing:0.15em;text-transform:uppercase;}
+    .nav-links{display:flex;gap:32px;list-style:none;}
+    .nav-links a{text-decoration:none;font-size:13px;font-weight:600;color:rgba(255,255,255,0.65);letter-spacing:0.05em;text-transform:uppercase;transition:color 0.3s;position:relative;}
+    .nav-links a::after{content:'';position:absolute;bottom:-3px;left:0;right:0;height:2px;background:var(--water-light);transform:scaleX(0);transition:transform 0.3s;}
+    .nav-links a:hover{color:var(--water-light);}
+    .nav-links a:hover::after{transform:scaleX(1);}
+
+    /* HERO */
+    .hero{min-height:100vh;position:relative;display:flex;align-items:center;overflow:hidden;background:var(--water-deep);}
+    .hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse at 20% 80%,rgba(14,107,124,0.6) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(29,166,190,0.3) 0%,transparent 50%),radial-gradient(ellipse at 50% 50%,rgba(10,61,71,1) 0%,#020e11 100%);}
+    .orb{position:absolute;border-radius:50%;filter:blur(60px);animation:floatOrb 8s ease-in-out infinite;pointer-events:none;}
+    .orb-1{width:500px;height:500px;background:rgba(24,166,190,0.12);top:-100px;right:-100px;}
+    .orb-2{width:350px;height:350px;background:rgba(45,122,79,0.15);bottom:-80px;left:-80px;animation-delay:3s;}
+    .orb-3{width:250px;height:250px;background:rgba(232,184,75,0.08);top:40%;left:40%;animation-delay:5s;}
+    @keyframes floatOrb{0%,100%{transform:translate(0,0) scale(1);}33%{transform:translate(30px,-20px) scale(1.05);}66%{transform:translate(-20px,30px) scale(0.95);}}
+    .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(125,216,232,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(125,216,232,0.04) 1px,transparent 1px);background-size:50px 50px;pointer-events:none;}
+    .hero-wave{position:absolute;bottom:-2px;left:0;right:0;z-index:2;}
+    .hero-content{position:relative;z-index:5;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;width:100%;padding:100px 6% 80px;}
+    .hero-left{color:white;}
+    .hero-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(125,216,232,0.08);border:1px solid rgba(125,216,232,0.2);padding:6px 14px;border-radius:100px;font-family:'Space Mono',monospace;font-size:10px;color:var(--water-light);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:28px;animation:fadeInUp 0.8s ease both;}
+    .hero-tag .pulse{width:7px;height:7px;background:var(--leaf-light);border-radius:50%;animation:pulse 2s ease infinite;}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1);}50%{opacity:0.5;transform:scale(0.6);}}
+    .hero-title{font-family:'Playfair Display',serif;font-size:72px;line-height:1.0;font-weight:900;margin-bottom:8px;animation:fadeInUp 0.8s 0.1s ease both;}
+    .hero-title .desa{display:block;color:rgba(255,255,255,0.45);font-size:28px;font-weight:700;letter-spacing:0.2em;text-transform:uppercase;margin-bottom:4px;}
+    .hero-title .ponggok{display:block;background:linear-gradient(90deg,var(--water-light),var(--leaf-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+    .hero-desc{font-size:15px;line-height:1.75;color:rgba(255,255,255,0.55);max-width:460px;margin:24px 0 36px;animation:fadeInUp 0.8s 0.2s ease both;}
+    .hero-cta{display:flex;gap:14px;animation:fadeInUp 0.8s 0.3s ease both;}
+    .btn-water{display:inline-flex;align-items:center;gap:10px;padding:14px 28px;background:linear-gradient(135deg,var(--water-bright),var(--water-mid));color:white;border-radius:50px;font-size:14px;font-weight:700;text-decoration:none;transition:all 0.3s ease;box-shadow:0 4px 20px rgba(24,166,190,0.3);}
+    .btn-water:hover{transform:translateY(-3px);box-shadow:0 10px 30px rgba(24,166,190,0.4);}
+    .btn-ghost{display:inline-flex;align-items:center;gap:10px;padding:14px 28px;border:1px solid rgba(125,216,232,0.3);color:var(--water-light);border-radius:50px;font-size:14px;font-weight:700;text-decoration:none;transition:all 0.3s ease;}
+    .btn-ghost:hover{background:rgba(125,216,232,0.08);border-color:var(--water-light);}
+    .hero-stats{display:flex;gap:32px;margin-top:44px;animation:fadeInUp 0.8s 0.4s ease both;}
+    .hstat{display:flex;flex-direction:column;gap:3px;border-left:2px solid rgba(125,216,232,0.25);padding-left:16px;}
+    .hstat-num{font-family:'Playfair Display',serif;font-size:28px;font-weight:700;color:var(--water-light);}
+    .hstat-label{font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.08em;}
+    .hero-right{animation:fadeInUp 0.8s 0.3s ease both;}
+    .map-card{background:rgba(255,255,255,0.04);border:1px solid rgba(125,216,232,0.15);border-radius:20px;overflow:hidden;box-shadow:0 30px 60px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.06);}
+    .map-card-header{background:rgba(0,0,0,0.3);padding:12px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,0.06);}
+    .mac-dots{display:flex;gap:6px;}
+    .mac-dot{width:11px;height:11px;border-radius:50%;}
+    .mac-dot.r{background:#ff5f57;}.mac-dot.y{background:#febc2e;}.mac-dot.g{background:#28c840;}
+    .map-card-title{font-family:'Space Mono',monospace;font-size:10px;color:rgba(255,255,255,0.35);letter-spacing:0.08em;flex:1;}
+    .map-live-badge{display:flex;align-items:center;gap:5px;font-family:'Space Mono',monospace;font-size:9px;color:var(--leaf-light);}
+    .map-live-badge .dot{width:6px;height:6px;background:var(--leaf-light);border-radius:50%;animation:pulse 1.5s infinite;}
+    #heroMiniMap{width:100%;height:260px;}
+    .map-card-footer{background:rgba(0,0,0,0.2);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,0.06);}
+    .coord-text{font-family:'Space Mono',monospace;font-size:10px;color:rgba(255,255,255,0.3);}
+
+    /* ABOUT */
+    .about-strip{background:var(--sand);padding:70px 6%;display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px;}
+    .about-card{display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:30px;background:white;border-radius:16px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 2px 20px rgba(0,0,0,0.04);transition:transform 0.3s,box-shadow 0.3s;}
+    .about-card:hover{transform:translateY(-5px);box-shadow:0 12px 40px rgba(0,0,0,0.08);}
+    .about-icon{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;}
+    .about-icon.blue{background:rgba(24,166,190,0.12);color:var(--water-mid);}
+    .about-icon.green{background:rgba(45,122,79,0.12);color:var(--leaf-dark);}
+    .about-icon.gold{background:rgba(232,184,75,0.12);color:#a8830f;}
+    .about-card h3{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--text-dark);}
+    .about-card p{font-size:13.5px;line-height:1.7;color:var(--text-mid);}
+
+    /* MAP SECTION */
+    .map-section{padding:70px 6% 90px;background:var(--cream);}
+    .section-eyebrow{font-family:'Space Mono',monospace;font-size:11px;color:var(--water-mid);text-transform:uppercase;letter-spacing:0.15em;display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+    .section-eyebrow::before{content:'';width:28px;height:2px;background:var(--water-bright);}
+    .section-title{font-family:'Playfair Display',serif;font-size:38px;font-weight:900;color:var(--text-dark);margin-bottom:6px;}
+    .section-title span{color:var(--water-mid);}
+    .section-desc{font-size:14px;color:var(--text-mid);margin-bottom:36px;max-width:500px;line-height:1.65;}
+    .map-wrapper{display:grid;grid-template-columns:290px 1fr;background:white;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,0.08);overflow:hidden;border:1px solid rgba(0,0,0,0.06);}
+    .layer-panel{background:#f9fafb;border-right:1px solid #e5e7eb;display:flex;flex-direction:column;max-height:640px;overflow-y:auto;}
+    .panel-header{background:linear-gradient(135deg,var(--water-deep),var(--water-mid));color:white;padding:18px 20px;font-family:'Playfair Display',serif;font-size:16px;font-weight:700;position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:10px;}
+    .panel-body{padding:18px 20px 24px;flex:1;}
+    .panel-section-label{font-family:'Space Mono',monospace;font-size:9px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.12em;margin-bottom:10px;margin-top:18px;}
+    .panel-section-label:first-child{margin-top:0;}
+    .layer-group{display:flex;flex-direction:column;gap:8px;}
+    .layer-item{display:flex;align-items:center;gap:10px;cursor:pointer;padding:9px 12px;border-radius:10px;background:white;border:1px solid #e5e7eb;transition:all 0.2s;}
+    .layer-item:hover{border-color:var(--water-bright);background:rgba(24,166,190,0.03);}
+    .layer-item input[type="checkbox"]{accent-color:var(--water-mid);width:15px;height:15px;}
+    .layer-name{font-size:12.5px;font-weight:600;color:#374151;}
+    .legend-section{margin-top:16px;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden;background:white;}
+    .legend-header{display:flex;align-items:center;justify-content:space-between;cursor:pointer;padding:10px 14px;background:#f8fafc;border-bottom:1px solid #e5e7eb;user-select:none;}
+    .legend-title{display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:var(--water-deep);text-transform:uppercase;letter-spacing:0.05em;}
+    .legend-title i{color:var(--water-bright);font-size:10px;}
+    .legend-toggle-icon{font-size:10px;color:#94a3b8;transition:transform 0.2s;}
+    .legend-toggle-icon.collapsed{transform:rotate(-90deg);}
+    .legend-list{padding:10px 14px 12px;display:flex;flex-direction:column;gap:5px;}
+    .legend-list.hidden{display:none;}
+    .legend-item{display:flex;align-items:center;gap:9px;font-size:11.5px;color:#475569;padding:2px 0;}
+    .legend-color{width:14px;height:14px;border-radius:4px;border:1.5px solid rgba(0,0,0,0.15);flex-shrink:0;}
+    .legend-line{width:22px;height:3px;background:#060203;border-radius:2px;flex-shrink:0;}
+    .legend-circle{width:14px;height:14px;border-radius:50%;border:2px solid #0e6b7c;background:#18a6be;flex-shrink:0;}
+    .map-container-wrap{height:640px;position:relative;}
+    #map{width:100%;height:100%;}
+    .map-overlay-badge{position:absolute;top:14px;right:14px;z-index:500;background:rgba(10,61,71,0.88);backdrop-filter:blur(8px);border:1px solid rgba(125,216,232,0.2);border-radius:10px;padding:10px 14px;display:flex;flex-direction:column;gap:3px;}
+    .overlay-label{font-family:'Space Mono',monospace;font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:0.1em;text-transform:uppercase;}
+    .overlay-value{font-family:'Space Mono',monospace;font-size:11px;color:var(--water-light);}
+
+    /* MARKER WISATA */
+    .wisata-marker{width:36px;height:36px;background:linear-gradient(135deg,#18a6be,#0e6b7c);border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.3);}
+    .wisata-marker-inner{width:100%;height:100%;display:flex;align-items:center;justify-content:center;transform:rotate(45deg);color:white;font-size:14px;}
+
+    /* POPUP WISATA */
+    .popup-wisata{font-family:'Nunito',sans-serif;min-width:220px;}
+    .popup-foto{width:100%;height:140px;object-fit:cover;border-radius:8px;margin-bottom:10px;display:block;}
+    .popup-nama{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#0e6b7c;margin-bottom:6px;}
+    .popup-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(24,166,190,0.1);color:#0e6b7c;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:600;}
+
+    /* FOOTER */
+    footer{background:var(--water-deep);padding:40px 6%;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px;}
+    .footer-brand{display:flex;flex-direction:column;gap:4px;}
+    .footer-brand-name{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--water-light);}
+    .footer-copy{font-size:12px;color:rgba(255,255,255,0.3);}
+    .footer-tech{display:flex;align-items:center;gap:20px;}
+    .tech-badge{padding:5px 12px;border:1px solid rgba(125,216,232,0.15);border-radius:20px;font-family:'Space Mono',monospace;font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:0.08em;}
+
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+    .layer-panel::-webkit-scrollbar{width:5px;}
+    .layer-panel::-webkit-scrollbar-track{background:transparent;}
+    .layer-panel::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:10px;}
+    .leaflet-popup-content-wrapper{border-radius:12px !important;padding:0 !important;overflow:hidden;}
+    .leaflet-popup-content{margin:14px !important;}
+  </style>
+</head>
+<body>
+
+  <nav class="navbar">
+    <a href="#beranda" class="nav-brand">
+      <div class="brand-emblem"><i class="fas fa-tint"></i></div>
+      <div class="brand-text">
+        <span class="brand-main">Desa Wisata Ponggok</span>
+        <span class="brand-sub">WebGIS · Kab. Klaten · Jawa Tengah</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#beranda">Beranda</a></li>
+      <li><a href="#peta">Peta Spasial</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero" id="beranda">
+    <div class="hero-bg"></div>
+    <div class="hero-grid"></div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+    <div class="hero-content">
+      <div class="hero-left">
+        <div class="hero-tag"><span class="pulse"></span> WebGIS Portal · Kec. Polanharjo · Kab. Klaten</div>
+        <h1 class="hero-title">
+          <span class="desa">Desa Wisata</span>
+          <span class="ponggok">Ponggok</span>
+        </h1>
+        <p class="hero-desc">Portal pemetaan digital resmi Desa Wisata Ponggok yang menyajikan data spasial pertanahan, tata ruang wilayah, dan titik-titik destinasi wisata secara interaktif.</p>
+        <div class="hero-cta">
+          <a href="#peta" class="btn-water"><i class="fas fa-map-marked-alt"></i> Jelajahi Peta</a>
+          <a href="#tentang" class="btn-ghost"><i class="fas fa-info-circle"></i> Tentang Desa</a>
+        </div>
+        <div class="hero-stats">
+          <div class="hstat"><span class="hstat-num">4</span><span class="hstat-label">Layer GeoJSON</span></div>
+          <div class="hstat"><span class="hstat-num">11</span><span class="hstat-label">Wisata</span></div>
+          <div class="hstat"><span class="hstat-num">2026</span><span class="hstat-label">Data Terkini</span></div>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="map-card">
+          <div class="map-card-header">
+            <div class="mac-dots"><span class="mac-dot r"></span><span class="mac-dot y"></span><span class="mac-dot g"></span></div>
+            <span class="map-card-title"><i class="fas fa-satellite-dish"></i> &nbsp; Quick View — Ponggok</span>
+            <div class="map-live-badge"><span class="dot"></span> LIVE</div>
+          </div>
+          <div id="heroMiniMap"></div>
+          <div class="map-card-footer">
+            <span class="coord-text">-7.6160°S, 110.6350°E</span>
+            <span class="coord-text">Zoom 14 · WGS84</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <svg class="hero-wave" viewBox="0 0 1440 60" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,30 C360,60 1080,0 1440,30 L1440,60 L0,60 Z" fill="#f5ede0"/>
+    </svg>
+  </section>
+
+  <section class="about-strip" id="tentang">
+    <div class="about-card">
+      <div class="about-icon blue"><i class="fas fa-water"></i></div>
+      <h3>Wisata Air</h3>
+      <p>Ponggok dikenal sebagai desa wisata berbasis mata air alami yang jernih — destinasi ikonik di Klaten dengan ekosistem bawah air yang kaya.</p>
+    </div>
+    <div class="about-card">
+      <div class="about-icon green"><i class="fas fa-map-marked-alt"></i></div>
+      <h3>Sistem Informasi Lahan</h3>
+      <p>Portal ini menyajikan data hak atas tanah, penggunaan lahan, dan batas administrasi desa secara transparan dan dapat diakses publik.</p>
+    </div>
+    <div class="about-card">
+      <div class="about-icon gold"><i class="fas fa-shield-alt"></i></div>
+      <h3>Tata Kelola Terbuka</h3>
+      <p>Komitmen Desa Wisata Ponggok dalam mendorong transparansi pertanahan dan perencanaan tata ruang berbasis data geospasial terkini.</p>
+    </div>
+  </section>
+
+  <section id="peta" class="map-section">
+    <div class="section-eyebrow">Geoportal Utama</div>
+    <h2 class="section-title">Peta <span>Spasial</span> Interaktif</h2>
+    <p class="section-desc">Klik pada titik wisata untuk melihat foto dan informasi. Aktifkan atau nonaktifkan layer sesuai kebutuhan.</p>
+
+    <div class="map-wrapper">
+      <div class="layer-panel">
+        <div class="panel-header"><i class="fas fa-layer-group"></i> Layer &amp; Legenda</div>
+        <div class="panel-body">
+          <div class="panel-section-label">Toggle Layer</div>
+          <div class="layer-group">
+            <label class="layer-item"><input type="checkbox" id="admLayerToggle" checked /><span class="layer-name">Batas Administrasi</span></label>
+            <label class="layer-item"><input type="checkbox" id="tanahLayerToggle" checked /><span class="layer-name">Tipe Hak / Bidang Tanah</span></label>
+            <label class="layer-item"><input type="checkbox" id="plLayerToggle" checked /><span class="layer-name">Penggunaan Lahan (PL)</span></label>
+            <label class="layer-item"><input type="checkbox" id="wisataLayerToggle" checked /><span class="layer-name">Titik Wisata</span></label>
+          </div>
+
+          <div class="panel-section-label">Legenda</div>
+
+          <div class="legend-section">
+            <div class="legend-header" onclick="toggleLegend('leg-adm',this)">
+              <div class="legend-title"><i class="fas fa-draw-polygon"></i> Batas Administrasi</div>
+              <i class="fas fa-chevron-down legend-toggle-icon"></i>
+            </div>
+            <div class="legend-list" id="leg-adm">
+              <div class="legend-item"><div class="legend-line"></div><span>Batas Administrasi Desa</span></div>
+            </div>
+          </div>
+
+          <div class="legend-section">
+            <div class="legend-header" onclick="toggleLegend('leg-hak',this)">
+              <div class="legend-title"><i class="fas fa-file-alt"></i> Tipe Hak Tanah</div>
+              <i class="fas fa-chevron-down legend-toggle-icon"></i>
+            </div>
+            <div class="legend-list" id="leg-hak">
+              <div class="legend-item"><div class="legend-color" style="background:#359de3;"></div><span>Hak Guna Bangunan</span></div>
+              <div class="legend-item"><div class="legend-color" style="background:#892ac8;"></div><span>Hak Milik</span></div>
+              <div class="legend-item"><div class="legend-color" style="background:#d06b7f;"></div><span>Hak Pakai</span></div>
+              <div class="legend-item"><div class="legend-color" style="background:#35dd54;"></div><span>Kosong</span></div>
+            </div>
+          </div>
+
+          <div class="legend-section">
+            <div class="legend-header" onclick="toggleLegend('leg-pl',this)">
+              <div class="legend-title"><i class="fas fa-map"></i> Penggunaan Lahan</div>
+              <i class="fas fa-chevron-down legend-toggle-icon"></i>
+            </div>
+            <div class="legend-list" id="leg-pl">
+              <div class="legend-item"><div class="legend-color" style="background:#e37bc2;"></div><span>Bangunan Hunian</span></div>
+              <div class="legend-item"><div class="legend-color" style="background:#15ea87;"></div><span>Bangunan Pendidikan</span></div>
+              <div class="legend-item"><div class="legend-color" style="background:#bec056;"></div><span>Jalan</span></div>
+              <div class="legend-item"><div class="legend-color" style="background:#0cad95;"></div><span>Kantor Pemerintahan</span></div>
+              <div class="legend-item"><div class="legend-color" style="background:#9ce642;"></div><span>Kolam</span></div>
+              <div class="legend-item"><div class="legend-color" style="background:#dacb28;"></div><span>Masjid</span></div>
+              <div class="legend-item"><div class="legend-color" style="background:#9969b3;"></div><span>Pekarangan</span></div>
+              <div class="legend-item"><div class="legend-color" style="background:#2792b5;"></div><span>Pendidikan Dasar</span></div>
+              <div class="legend-item"><div class="legend-color" style="background:#8f106b;"></div><span>Rumah Toko</span></div>
+              <div class="legend-item"><div class="legend-color" style="background:#52cd6d;"></div><span>Sawah</span></div>
+              <div class="legend-item"><div class="legend-color" style="background:#e6b18c;"></div><span>Semak Belukar</span></div>
+              <div class="legend-item"><div class="legend-color" style="background:#a734d4;"></div><span>Sungai</span></div>
+              <div class="legend-item"><div class="legend-color" style="background:#4b2fba;"></div><span>Tempat Hiburan</span></div>
+              <div class="legend-item"><div class="legend-color" style="background:#837b37;"></div><span>TPA / Sampah</span></div>
+            </div>
+          </div>
+
+          <div class="legend-section">
+            <div class="legend-header" onclick="toggleLegend('leg-wisata',this)">
+              <div class="legend-title"><i class="fas fa-map-marker-alt"></i> Titik Wisata</div>
+              <i class="fas fa-chevron-down legend-toggle-icon"></i>
+            </div>
+            <div class="legend-list" id="leg-wisata">
+              <div class="legend-item"><div class="legend-circle"></div><span>Destinasi Wisata</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="map-container-wrap">
+        <div class="map-overlay-badge">
+          <span class="overlay-label">Koordinat Pusat</span>
+          <span class="overlay-value">-7.6160°S · 110.6350°E</span>
+        </div>
+        <div id="map"></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-brand">
+      <span class="footer-brand-name">Desa Wisata Ponggok</span>
+      <span class="footer-copy">© 2026 Pemerintah Desa Wisata Ponggok · Kec. Polanharjo · Kab. Klaten</span>
+    </div>
+    <div class="footer-tech">
+      <span class="tech-badge">Leaflet 1.9.4</span>
+      <span class="tech-badge">GeoJSON</span>
+      <span class="tech-badge">GitHub Pages</span>
+    </div>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const BASE       = 'https://raw.githubusercontent.com/Aovmn/Ponggok-Webgis/main/';
+    const URL_ADM    = BASE + 'admin_ponggok.geojson';
+    const URL_TANAH  = BASE + 'znt_ponggok.geojson';
+    const URL_PL     = BASE + 'pl_ponggok.geojson';
+    const URL_WISATA = BASE + 'wisata_ponggok.geojson';
+
+    const warnaTanah = {
+      'Hak Guna Bangunan': '#359de3',
+      'Hak Milik':         '#892ac8',
+      'Hak Pakai':         '#d06b7f',
+    };
+    const warnaPL = {
+      'Bangunan Hunian':'#e37bc2','Bangunan Pendidikan Lainnya':'#15ea87',
+      'Jalan':'#bec056','Kantor Pemerintahan':'#0cad95','Kolam':'#9ce642',
+      'Masjid':'#dacb28','Pekarangan':'#9969b3','Pendidikan Dasar/Setingkat':'#2792b5',
+      'Rumah Toko':'#8f106b','Sawah':'#52cd6d','Semak Belukar':'#e6b18c',
+      'Sungai':'#a734d4','Tempat Hiburan':'#4b2fba',
+      'Tempat Penimbunan & Pembuangan Sampah':'#837b37',
+    };
+
+    function toggleLegend(id, headerEl) {
+      document.getElementById(id).classList.toggle('hidden');
+      headerEl.querySelector('.legend-toggle-icon').classList.toggle('collapsed');
+    }
+
+    const map = L.map('map').setView([-7.6160, 110.6350], 15);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19, attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    const wisataIcon = L.divIcon({
+      className: '',
+      html: '<div class="wisata-marker"><div class="wisata-marker-inner"><i class="fas fa-camera"></i></div></div>',
+      iconSize: [36, 36], iconAnchor: [18, 36], popupAnchor: [0, -36]
+    });
+
+    let admLayer, tanahLayer, plLayer, wisataLayer;
+
+    fetch(URL_ADM).then(r => r.json()).then(data => {
+      admLayer = L.geoJSON(data, {
+        style: { color: '#060203', weight: 2, fillOpacity: 0 }
+      }).addTo(map);
+    }).catch(() => console.log('Gagal load admin_ponggok.geojson'));
+
+    fetch(URL_TANAH).then(r => r.json()).then(data => {
+      tanahLayer = L.geoJSON(data, {
+        style: f => {
+          const hak = f.properties.Status_Hak || f.properties.status_hak || '';
+          return { fillColor: warnaTanah[hak] || '#35dd54', fillOpacity: 0.6, color: '#333', weight: 0.5 };
+        },
+        onEachFeature: (f, layer) => {
+          const hak = f.properties.Status_Hak || f.properties.status_hak || 'Kosong';
+          layer.bindPopup(`<div style="font-family:'Nunito',sans-serif;min-width:180px;padding:4px;">
+            <h4 style="margin:0 0 8px;font-family:'Playfair Display',serif;color:#0e6b7c;border-bottom:2px solid #f1f5f9;padding-bottom:5px;font-size:14px;">Informasi Bidang Tanah</h4>
+            <p style="margin:5px 0;font-size:12px;color:#475569;"><b style="color:#1c2b20;">Status Hak:</b> ${hak}</p>
+          </div>`);
+        }
+      }).addTo(map);
+    }).catch(() => console.log('Gagal load znt_ponggok.geojson'));
+
+    fetch(URL_PL).then(r => r.json()).then(data => {
+      plLayer = L.geoJSON(data, {
+        style: f => {
+          const pl = f.properties.V4_JB || '';
+          return { fillColor: warnaPL[pl] || '#cccccc', fillOpacity: 0.65, color: '#333', weight: 0.5 };
+        },
+        onEachFeature: (f, layer) => {
+          const pl = f.properties.V4_JB || 'Tidak Teridentifikasi';
+          layer.bindPopup(`<div style="font-family:'Nunito',sans-serif;min-width:180px;padding:4px;">
+            <h4 style="margin:0 0 8px;font-family:'Playfair Display',serif;color:#0e6b7c;border-bottom:2px solid #f1f5f9;padding-bottom:5px;font-size:14px;">Penggunaan Lahan</h4>
+            <p style="margin:5px 0;font-size:12px;color:#475569;"><b style="color:#1c2b20;">Jenis:</b> ${pl}</p>
+          </div>`);
+        }
+      }).addTo(map);
+    }).catch(() => console.log('Gagal load pl_ponggok.geojson'));
+
+    fetch(URL_WISATA).then(r => r.json()).then(data => {
+      wisataLayer = L.geoJSON(data, {
+        pointToLayer: (f, latlng) => L.marker(latlng, { icon: wisataIcon }),
+        onEachFeature: (f, layer) => {
+          const nama = f.properties.Nama_Bangu || f.properties.nama || 'Titik Wisata';
+          const foto = f.properties.Foto || f.properties.foto || '';
+          layer.bindPopup(`<div class="popup-wisata">
+            ${foto ? `<img src="${foto}" class="popup-foto" alt="${nama}" onerror="this.style.display='none'"/>` : ''}
+            <div class="popup-nama">${nama}</div>
+            <div class="popup-badge"><i class="fas fa-map-marker-alt"></i> Destinasi Wisata Ponggok</div>
+          </div>`, { maxWidth: 260 });
+        }
+      }).addTo(map);
+    }).catch(() => console.log('Gagal load wisata_ponggok.geojson'));
+
+    document.getElementById('admLayerToggle').addEventListener('change', e => {
+      if (!admLayer) return;
+      e.target.checked ? map.addLayer(admLayer) : map.removeLayer(admLayer);
+    });
+    document.getElementById('tanahLayerToggle').addEventListener('change', e => {
+      if (!tanahLayer) return;
+      e.target.checked ? map.addLayer(tanahLayer) : map.removeLayer(tanahLayer);
+    });
+    document.getElementById('plLayerToggle').addEventListener('change', e => {
+      if (!plLayer) return;
+      e.target.checked ? map.addLayer(plLayer) : map.removeLayer(plLayer);
+    });
+    document.getElementById('wisataLayerToggle').addEventListener('change', e => {
+      if (!wisataLayer) return;
+      e.target.checked ? map.addLayer(wisataLayer) : map.removeLayer(wisataLayer);
+    });
+
+    const miniMap = L.map('heroMiniMap', {
+      dragging: false, zoomControl: false, scrollWheelZoom: false
+    }).setView([-7.6160, 110.6350], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(miniMap);
+  </script>
+</body>
+</html>
