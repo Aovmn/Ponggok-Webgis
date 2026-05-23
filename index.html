@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Desa Wisata Ponggok — Portal Geospasial & Tata Ruang</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=Nunito:wght@300;400;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght=0,700;0,900;1,700&family=Nunito:wght=300;400;600;700&family=Space+Mono:wght=400;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <style>
@@ -351,7 +351,6 @@
   </footer>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- Menambahkan library turf.js untuk kalkulasi titik klik di dalam polygon (point in polygon) -->
   <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
   <script>
     const BASE       = 'https://raw.githubusercontent.com/Aovmn/Ponggok-Webgis/main/';
@@ -379,7 +378,7 @@
       headerEl.querySelector('.legend-toggle-icon').classList.toggle('collapsed');
     }
 
-    // Pendefinisian Dua Basemap Berbeda
+    // 1. Definisikan Dua Basemap (OSM Jalanan & Esri Citra Satelit)
     const osmTile = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19, attribution: '© OpenStreetMap'
     });
@@ -387,8 +386,9 @@
       maxZoom: 19, attribution: 'Tiles © Esri — Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community'
     });
 
+    // 2. Tampilkan Peta Utama dengan Latar Default OSM
     const map = L.map('map', {
-      layers: [osmTile] // Default awal pake OSM
+      layers: [osmTile] 
     }).setView([-7.6160, 110.6350], 15);
 
     const wisataIcon = L.divIcon({
@@ -397,7 +397,6 @@
       iconSize: [36, 36], iconAnchor: [18, 36], popupAnchor: [0, -36]
     });
 
-    // Variabel Global untuk menyimpan mentahan data GeoJSON asli
     let rawAdmData = null, rawTanahData = null, rawPlData = null;
     let admLayer, tanahLayer, plLayer, wisataLayer;
 
@@ -431,7 +430,7 @@
       }).addTo(map);
     }).catch(() => console.log('Gagal load Penggunaan Lahan.geojson'));
 
-    // Load Wisata (Titik khusus penanda wisata menggunakan marker bawaan tersendiri agar pop-up foto berfungsi prima)
+    // Load Wisata
     fetch(URL_WISATA).then(r => r.json()).then(data => {
       wisataLayer = L.geoJSON(data, {
         pointToLayer: (f, latlng) => L.marker(latlng, { icon: wisataIcon }),
@@ -447,14 +446,13 @@
       }).addTo(map);
     }).catch(() => console.log('Gagal load Wisata.geojson'));
 
-    // LOGIKA INTEGRASI: Fungsi Menyatukan Semua Informasi Klik Lahan Polygon
+    // Logika Deteksi Klik Gabungan di Semua Layer Polygon (Menggunakan Turf.js)
     map.on('click', function(e) {
       const pt = turf.point([e.latlng.lng, e.latlng.lat]);
       let infoAdm = null;
       let infoHak = null;
       let infoPl = null;
 
-      // 1. Ambil info Administrasi (jika layernya sedang aktif di peta)
       if (rawAdmData && map.hasLayer(admLayer)) {
         for (let feat of rawAdmData.features) {
           if (feat.geometry && (feat.geometry.type === 'Polygon' || feat.geometry.type === 'MultiPolygon')) {
@@ -466,7 +464,6 @@
         }
       }
 
-      // 2. Ambil info Status Hak (jika layernya sedang aktif di peta)
       if (rawTanahData && map.hasLayer(tanahLayer)) {
         for (let feat of rawTanahData.features) {
           if (feat.geometry && (feat.geometry.type === 'Polygon' || feat.geometry.type === 'MultiPolygon')) {
@@ -478,7 +475,6 @@
         }
       }
 
-      // 3. Ambil info Penggunaan Lahan (jika layernya sedang aktif di peta)
       if (rawPlData && map.hasLayer(plLayer)) {
         for (let feat of rawPlData.features) {
           if (feat.geometry && (feat.geometry.type === 'Polygon' || feat.geometry.type === 'MultiPolygon')) {
@@ -490,7 +486,6 @@
         }
       }
 
-      // Bangun konten popup terpadu jika ada minimal satu info layer yang ter-klik
       if (infoAdm || infoHak || infoPl) {
         let content = `<div class="popup-combined">
           <h4><i class="fas fa-info-circle"></i> Informasi Geospasial</h4>`;
@@ -513,7 +508,6 @@
             <div class="popup-sec-val">${infoPl}</div>
           </div>`;
         }
-        
         content += `</div>`;
 
         L.popup()
@@ -523,21 +517,21 @@
       }
     });
 
-    // Kontrol Navigasi Ganti Basemap (Radio Button)
+    // Kontrol Navigasi Interaktif untuk Mengganti Jenis Latar Basemap (Radio Button)
     document.getElementById('osmBase').addEventListener('change', function(e) {
       if (e.target.checked) {
-        map.removeLayer(satelliteTile);
-        map.addLayer(osmTile);
+        if (map.hasLayer(satelliteTile)) map.removeLayer(satelliteTile);
+        if (!map.hasLayer(osmTile)) map.addLayer(osmTile);
       }
     });
     document.getElementById('satellitBase').addEventListener('change', function(e) {
       if (e.target.checked) {
-        map.removeLayer(osmTile);
-        map.addLayer(satelliteTile);
+        if (map.hasLayer(osmTile)) map.removeLayer(osmTile);
+        if (!map.hasLayer(satelliteTile)) map.addLayer(satelliteTile);
       }
     });
 
-    // Kontrol Navigasi Layer Hidup/Mati (Checkbox)
+    // Kontrol Navigasi Menyalakan / Mematikan Lapisan Layer Utama (Checkbox)
     document.getElementById('admLayerToggle').addEventListener('change', e => {
       if (!admLayer) return;
       e.target.checked ? map.addLayer(admLayer) : map.removeLayer(admLayer);
