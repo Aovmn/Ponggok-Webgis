@@ -209,7 +209,7 @@
     <div class="about-card">
       <div class="about-icon blue"><i class="fas fa-water"></i></div>
       <h3>Wisata Air</h3>
-      <p>Ponggok dikenal sebagai desa wisata berbasis mata air alami yang jernih — destinasi ikonik di Klaten dengan ekosistem bawah air yang kaya.</p>
+      <p>Ponggok dikenal as desa wisata berbasis mata air alami yang jernih — destinasi ikonik di Klaten dengan ekosistem bawah air yang kaya.</p>
     </div>
     <div class="about-card">
       <div class="about-icon green"><i class="fas fa-map-marked-alt"></i></div>
@@ -366,7 +366,7 @@
       admLayer = L.geoJSON(data, {
         style: { color: '#060203', weight: 2, fillOpacity: 0 }
       }).addTo(map);
-    }).catch(() => console.log('Gagal load admin_ponggok.geojson'));
+    }).catch(() => console.log('Gagal load Administrasi.geojson'));
 
     fetch(URL_TANAH).then(r => r.json()).then(data => {
       tanahLayer = L.geoJSON(data, {
@@ -382,7 +382,7 @@
           </div>`);
         }
       }).addTo(map);
-    }).catch(() => console.log('Gagal load znt_ponggok.geojson'));
+    }).catch(() => console.log('Gagal load Status Hak.geojson'));
 
     fetch(URL_PL).then(r => r.json()).then(data => {
       plLayer = L.geoJSON(data, {
@@ -398,7 +398,7 @@
           </div>`);
         }
       }).addTo(map);
-    }).catch(() => console.log('Gagal load pl_ponggok.geojson'));
+    }).catch(() => console.log('Gagal load Penggunaan Lahan.geojson'));
 
     fetch(URL_WISATA).then(r => r.json()).then(data => {
       wisataLayer = L.geoJSON(data, {
@@ -413,7 +413,7 @@
           </div>`, { maxWidth: 260 });
         }
       }).addTo(map);
-    }).catch(() => console.log('Gagal load wisata_ponggok.geojson'));
+    }).catch(() => console.log('Gagal load Wisata.geojson'));
 
     document.getElementById('admLayerToggle').addEventListener('change', e => {
       if (!admLayer) return;
