@@ -1,0 +1,18 @@
+{
+"type": "FeatureCollection",
+"name": "Wisata Ponggok",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:EPSG::32749" } },
+"features": [
+{ "type": "Feature", "properties": { "Nama_Bangu": "Umbul Ponggok", "Foto": "https://raw.githubusercontent.com/Aovmn/Foto-Wisata/main/PHOWPGK12.jpg" }, "geometry": { "type": "Point", "coordinates": [ 459826.806400000117719, 9158389.705399999395013, 0.0 ] } },
+{ "type": "Feature", "properties": { "Nama_Bangu": "Ponggok Paradesa", "Foto": "https://raw.githubusercontent.com/Aovmn/Foto-Wisata/main/PHOWPGK10.jpg" }, "geometry": { "type": "Point", "coordinates": [ 460114.045699999667704, 9158561.50650000013411, 0.0 ] } },
+{ "type": "Feature", "properties": { "Nama_Bangu": "Bale Tirto", "Foto": "https://raw.githubusercontent.com/Aovmn/Foto-Wisata/main/PHOWPGK11.jpg" }, "geometry": { "type": "Point", "coordinates": [ 459999.286000000312924, 9158594.854699999094009, 0.0 ] } },
+{ "type": "Feature", "properties": { "Nama_Bangu": "The Honduras", "Foto": "https://raw.githubusercontent.com/Aovmn/Foto-Wisata/main/PHOWPGK07.jpg" }, "geometry": { "type": "Point", "coordinates": [ 460973.040900000371039, 9158709.570299999788404, 0.0 ] } },
+{ "type": "Feature", "properties": { "Nama_Bangu": "Contigo", "Foto": "https://raw.githubusercontent.com/Aovmn/Foto-Wisata/main/PHOWPGK09.jpg" }, "geometry": { "type": "Point", "coordinates": [ 460537.38300000037998, 9158761.9386, 0.0 ] } },
+{ "type": "Feature", "properties": { "Nama_Bangu": "Soko Alas", "Foto": "https://raw.githubusercontent.com/Aovmn/Foto-Wisata/main/PHOWPGK08.jpg" }, "geometry": { "type": "Point", "coordinates": [ 460564.618999999947846, 9158775.444499999284744, 0.0 ] } },
+{ "type": "Feature", "properties": { "Nama_Bangu": "Bumi Tirta Village", "Foto": "https://raw.githubusercontent.com/Aovmn/Foto-Wisata/main/PHOWPGK02.jpg" }, "geometry": { "type": "Point", "coordinates": [ 460370.055200000293553, 9158782.927799999713898, 0.0 ] } },
+{ "type": "Feature", "properties": { "Nama_Bangu": "Umbul Besuki", "Foto": "https://raw.githubusercontent.com/Aovmn/Foto-Wisata/main/PHOWPGK01.jpg" }, "geometry": { "type": "Point", "coordinates": [ 460211.164200000464916, 9158857.007099999114871, 0.0 ] } },
+{ "type": "Feature", "properties": { "Nama_Bangu": "Watu Gong", "Foto": "https://raw.githubusercontent.com/Aovmn/Foto-Wisata/main/PHOWPGK06.jpg" }, "geometry": { "type": "Point", "coordinates": [ 461050.317599999718368, 9158895.3103, 0.0 ] } },
+{ "type": "Feature", "properties": { "Nama_Bangu": "Lembah Ali", "Foto": "https://raw.githubusercontent.com/Aovmn/Foto-Wisata/main/PHOWPGK03.jpg" }, "geometry": { "type": "Point", "coordinates": [ 460516.013700000010431, 9159022.746899999678135, 0.0 ] } },
+{ "type": "Feature", "properties": { "Nama_Bangu": "Umbul Sigedang Kapilaler", "Foto": "https://raw.githubusercontent.com/Aovmn/Foto-Wisata/main/PHOWPGK05.jpg" }, "geometry": { "type": "Point", "coordinates": [ 460838.775100000202656, 9159185.688400000333786, 0.0 ] } }
+]
+}
