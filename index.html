@@ -88,6 +88,31 @@
     .map-card-footer{background:rgba(0,0,0,0.2);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;border-top:1px solid rgba(255,255,255,0.06);}
     .coord-text{font-family:'Space Mono',monospace;font-size:10px;color:rgba(255,255,255,0.3);}
 
+    /* ============ WISATA POPUP ============ */
+    .wisata-popup-wrap .leaflet-popup-content-wrapper{background:white;border-radius:16px;box-shadow:0 12px 40px rgba(0,0,0,0.18);border:1px solid rgba(14,107,124,0.12);padding:0;overflow:hidden;width:280px;}
+    .wisata-popup-wrap .leaflet-popup-content{margin:0;width:100%!important;}
+    .wisata-popup-wrap .leaflet-popup-tip-container{margin-top:-1px;}
+    .wisata-popup-wrap .leaflet-popup-tip{background:white;}
+    .wisata-popup-wrap .leaflet-popup-close-button{top:8px!important;right:10px!important;color:white!important;font-size:18px!important;font-weight:700;z-index:10;text-shadow:0 1px 3px rgba(0,0,0,0.4);}
+    .wp-foto{width:100%;height:140px;object-fit:cover;display:block;}
+    .wp-foto-placeholder{width:100%;height:90px;background:linear-gradient(135deg,rgba(24,166,190,0.2),rgba(14,107,124,0.15));display:flex;align-items:center;justify-content:center;font-size:30px;color:var(--water-mid);}
+    .wp-body{padding:13px 15px 15px;display:flex;flex-direction:column;gap:9px;}
+    .wp-nama{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:var(--water-deep);line-height:1.2;}
+    .wp-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(24,166,190,0.1);color:#0e6b7c;padding:2px 9px;border-radius:20px;font-size:10.5px;font-weight:600;align-self:flex-start;}
+    .wp-divider{border:none;border-top:1px solid #e5e7eb;margin:2px 0;}
+    .wp-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+    .wp-item{display:flex;flex-direction:column;gap:2px;background:#f8fafc;border-radius:8px;padding:7px 9px;border:1px solid #f1f5f9;}
+    .wp-item-label{font-family:'Space Mono',monospace;font-size:7.5px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;}
+    .wp-item-val{font-size:11px;color:#1e293b;font-weight:700;display:flex;align-items:center;gap:3px;}
+    .wp-item-val i{color:#0e6b7c;font-size:9px;}
+    .wp-tags-label{font-family:'Space Mono',monospace;font-size:7.5px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.06em;font-weight:700;}
+    .wp-tags{display:flex;flex-wrap:wrap;gap:4px;}
+    .wp-tag{display:inline-flex;align-items:center;gap:3px;background:rgba(24,166,190,0.08);border:1px solid rgba(14,107,124,0.12);color:#0e6b7c;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:600;}
+    .wp-tag.green{background:rgba(45,122,79,0.08);border-color:rgba(45,122,79,0.15);color:#1a4d2e;}
+    .wp-tag i{font-size:8px;}
+    .wp-maps-btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:9px 0;background:linear-gradient(135deg,#18a6be,#0e6b7c);color:white;border-radius:9px;text-decoration:none;font-size:12px;font-weight:700;transition:opacity 0.2s;}
+    .wp-maps-btn:hover{opacity:0.88;}
+
     /* ============ ABOUT ============ */
     .about-strip{background:var(--sand);padding:70px 6%;display:grid;grid-template-columns:1fr 1fr 1fr;gap:40px;position:relative;overflow:hidden;}
     .about-card{display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding:30px;background:white;border-radius:16px;border:1px solid rgba(0,0,0,0.05);box-shadow:0 2px 20px rgba(0,0,0,0.04);transition:transform 0.3s,box-shadow 0.3s;position:relative;overflow:hidden;}
@@ -121,8 +146,8 @@
     .search-result-name{font-size:13px;font-weight:600;color:var(--text-dark);}
     .search-result-cat{font-size:10.5px;color:#94a3b8;margin-left:auto;}
 
-    /* Map wrapper — 3 kolom: panel | peta | info */
-    .map-wrapper{display:grid;grid-template-columns:260px 1fr 300px;background:white;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,0.08);overflow:hidden;border:1px solid rgba(0,0,0,0.06);min-height:640px;}
+    /* Map wrapper — 2 kolom: panel | peta */
+    .map-wrapper{display:grid;grid-template-columns:260px 1fr;background:white;border-radius:20px;box-shadow:0 8px 40px rgba(0,0,0,0.08);overflow:hidden;border:1px solid rgba(0,0,0,0.06);min-height:640px;}
 
     /* Panel kiri */
     .layer-panel{background:#f9fafb;border-right:1px solid #e5e7eb;display:flex;flex-direction:column;max-height:640px;overflow-y:auto;}
@@ -476,18 +501,7 @@
           <div id="map"></div>
         </div>
 
-        <!-- Panel Kanan: Info Wisata -->
-        <div class="info-panel" id="infoPanel">
-          <div class="info-panel-header">
-            <i class="fas fa-info-circle"></i> Detail Wisata
-            <button class="info-close-btn" id="infoPanelClose" style="display:none;" onclick="closeInfoPanel()"><i class="fas fa-times"></i></button>
-          </div>
-          <div class="info-panel-empty" id="infoPanelEmpty">
-            <i class="fas fa-hand-pointer"></i>
-            <p>Klik pada <strong>titik wisata</strong> di peta untuk melihat informasi lengkapnya di sini.</p>
-          </div>
-          <div class="info-panel-content" id="infoPanelContent"></div>
-        </div>
+        <!-- Panel Kanan dihapus — diganti popup -->
       </div>
     </div>
   </section>
@@ -605,6 +619,7 @@
 
     // ============ DATA WISATA ============
     const wisataDetail = {
+      'Umbul Ponggok': { kategori:'Wisata Air', jam:'08.00 – 17.00', tiket:'Rp 10.000', mapsUrl:'https://maps.app.goo.gl/jPV5PXKdW5oTG3CSA', fasilitas:['Kamar Mandi','Area Parkir'], akses:['Mobil','Bus','Motor'] },
       'umbul ponggok': { kategori:'Wisata Air', jam:'08.00 – 17.00', tiket:'Rp 10.000', mapsUrl:'https://maps.app.goo.gl/jPV5PXKdW5oTG3CSA', fasilitas:['Kamar Mandi','Area Parkir'], akses:['Mobil','Bus','Motor'] },
       'Ponggok Paradesa': { kategori:'Wisata Air', jam:'08.00 – 17.00', tiket:'Rp 5.000', mapsUrl:'https://maps.app.goo.gl/imxYZugCbEeB4kJa9', fasilitas:['Kamar Mandi','Area Parkir'], akses:['Mobil','Bus','Motor'] },
       'Bale Tirto': { kategori:'Penginapan', jam:'Buka 24 Jam', tiket:'± Rp 300.000 / malam', mapsUrl:'https://maps.app.goo.gl/9Sbydp1uf6vYuvqo9', fasilitas:['Kolam Renang','Restoran','Dan lain-lain'], akses:['Mobil','Bus','Motor'] },
@@ -618,61 +633,70 @@
       'Umbul Sigedang Kapilaler': { kategori:'Wisata Air', jam:'08.00 – 17.00', tiket:'Rp 10.000', mapsUrl:'https://maps.app.goo.gl/V7Q3foCrXixDufPb6', fasilitas:['Kamar Mandi','Area Parkir'], akses:['Mobil','Bus','Motor'] },
     };
 
-    // ============ INFO PANEL ============
-    function showInfoPanel(f, marker) {
+    // ============ POPUP WISATA ============
+    function getDetailByName(nama) {
+      // Coba exact match dulu, lalu case-insensitive
+      if (wisataDetail[nama]) return wisataDetail[nama];
+      const lower = nama.toLowerCase();
+      for (const key of Object.keys(wisataDetail)) {
+        if (key.toLowerCase() === lower) return wisataDetail[key];
+      }
+      return {};
+    }
+
+    function showWisataPopup(f, layer) {
       const nama = f.properties.Nama_Bangu || f.properties.nama || 'Titik Wisata';
       const foto = f.properties.Foto || f.properties.foto || '';
-      const det = wisataDetail[nama] || {};
+      const det = getDetailByName(nama);
       const kategori = det.kategori || 'Destinasi Wisata';
       const jam = det.jam || '–';
       const tiket = det.tiket || '–';
       const fasilitas = det.fasilitas || [];
       const akses = det.akses || [];
-      const mapsUrl = det.mapsUrl || `https://www.google.com/maps/search/?api=1&query=${marker.getLatLng().lat},${marker.getLatLng().lng}`;
+      const latlng = layer.getLatLng();
+      const mapsUrl = det.mapsUrl || `https://www.google.com/maps/search/?api=1&query=${latlng.lat},${latlng.lng}`;
 
       if (activeMarker) activeMarker.setIcon(wisataIcon);
-      activeMarker = marker;
-      marker.setIcon(wisataIconActive);
+      activeMarker = layer;
+      layer.setIcon(wisataIconActive);
 
-      const fasHtml = fasilitas.map(f => `<span class="info-tag"><i class="fas fa-check-circle"></i>${f}</span>`).join('');
+      const fasHtml = fasilitas.map(f => `<span class="wp-tag"><i class="fas fa-check-circle"></i>${f}</span>`).join('');
       const aksesHtml = akses.map(a => {
         const icon = a==='Mobil'?'fa-car':a==='Bus'?'fa-bus':'fa-motorcycle';
-        return `<span class="info-tag green"><i class="fas ${icon}"></i>${a}</span>`;
+        return `<span class="wp-tag green"><i class="fas ${icon}"></i>${a}</span>`;
       }).join('');
 
-      const content = document.getElementById('infoPanelContent');
-      content.innerHTML = `
-        ${foto ? `<img src="${foto}" class="info-foto" alt="${nama}" onerror="this.style.display='none'"/>` : `<div class="info-foto-placeholder"><i class="fas fa-water"></i></div>`}
-        <div class="info-body">
-          <div class="info-nama">${nama}</div>
-          <div class="info-badge"><i class="fas fa-tag"></i> ${kategori}</div>
-          <hr class="info-divider"/>
-          <div class="info-grid">
-            <div class="info-item">
-              <div class="info-item-label">Jam Buka</div>
-              <div class="info-item-val"><i class="fas fa-clock"></i>${jam}</div>
+      const popupContent = `
+        ${foto ? `<img src="${foto}" class="wp-foto" alt="${nama}" onerror="this.style.display='none'"/>` : `<div class="wp-foto-placeholder"><i class="fas fa-water"></i></div>`}
+        <div class="wp-body">
+          <div class="wp-nama">${nama}</div>
+          <div class="wp-badge"><i class="fas fa-tag"></i> ${kategori}</div>
+          <hr class="wp-divider"/>
+          <div class="wp-grid">
+            <div class="wp-item">
+              <div class="wp-item-label">Jam Buka</div>
+              <div class="wp-item-val"><i class="fas fa-clock"></i>${jam}</div>
             </div>
-            <div class="info-item">
-              <div class="info-item-label">Harga Tiket</div>
-              <div class="info-item-val"><i class="fas fa-ticket-alt"></i>${tiket}</div>
+            <div class="wp-item">
+              <div class="wp-item-label">Harga Tiket</div>
+              <div class="wp-item-val"><i class="fas fa-ticket-alt"></i>${tiket}</div>
             </div>
           </div>
-          ${fasHtml ? `<div class="info-tags-label">Fasilitas</div><div class="info-tags">${fasHtml}</div>` : ''}
-          ${aksesHtml ? `<div class="info-tags-label" style="margin-top:4px;">Akses Kendaraan</div><div class="info-tags">${aksesHtml}</div>` : ''}
-          <a href="${mapsUrl}" target="_blank" class="info-maps-btn"><i class="fab fa-google"></i> Buka di Google Maps</a>
+          ${fasHtml ? `<div class="wp-tags-label">Fasilitas</div><div class="wp-tags">${fasHtml}</div>` : ''}
+          ${aksesHtml ? `<div class="wp-tags-label" style="margin-top:3px;">Akses Kendaraan</div><div class="wp-tags">${aksesHtml}</div>` : ''}
+          <a href="${mapsUrl}" target="_blank" class="wp-maps-btn"><i class="fab fa-google"></i> Buka di Google Maps</a>
         </div>`;
 
-      document.getElementById('infoPanelEmpty').style.display = 'none';
-      content.style.display = 'block';
-      document.getElementById('infoPanelClose').style.display = 'flex';
+      L.popup({ className: 'wisata-popup-wrap', maxWidth: 280, closeButton: true })
+        .setLatLng(latlng)
+        .setContent(popupContent)
+        .openOn(map);
     }
 
-    function closeInfoPanel() {
-      document.getElementById('infoPanelEmpty').style.display = 'flex';
-      document.getElementById('infoPanelContent').style.display = 'none';
-      document.getElementById('infoPanelClose').style.display = 'none';
+    // Reset icon saat popup ditutup
+    map.on('popupclose', () => {
       if (activeMarker) { activeMarker.setIcon(wisataIcon); activeMarker = null; }
-    }
+    });
 
     // ============ LOAD LAYERS ============
     let loadedCount = 0;
@@ -703,7 +727,7 @@
       wisataLayer = L.geoJSON(data, {
         pointToLayer: (f, latlng) => L.marker(latlng, { icon: wisataIcon }),
         onEachFeature: (f, layer) => {
-          layer.on('click', () => showInfoPanel(f, layer));
+          layer.on('click', () => showWisataPopup(f, layer));
         }
       }).addTo(map);
       checkAllLoaded();
@@ -791,7 +815,7 @@
         const n = f.properties.Nama_Bangu || f.properties.nama;
         if (n === nama) {
           map.flyTo(layer.getLatLng(), 17, { duration: 1.2 });
-          setTimeout(() => showInfoPanel(f, layer), 1300);
+          setTimeout(() => showWisataPopup(f, layer), 1300);
         }
       });
     }
